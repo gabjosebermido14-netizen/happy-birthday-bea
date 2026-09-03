@@ -447,20 +447,26 @@
       }
     }
 
-    function handleGiftClick(e) {
-      if (e) e.preventDefault();
-      if (isClicked) return;
-      isClicked = true;
-
+    // Function to handle audio playback smoothly on Mobile browsers
+    function playAudio() {
       if (bgMusic) {
+        bgMusic.load(); // Force reload audio buffer
         bgMusic.currentTime = 0;
         const playPromise = bgMusic.play();
         if (playPromise !== undefined) {
           playPromise.catch(error => {
-            console.log("Audio play deferred or failed:", error);
+            console.log("Audio play blocked, waiting for user interaction:", error);
           });
         }
       }
+    }
+
+    function handleGiftClick(e) {
+      if (isClicked) return;
+      isClicked = true;
+
+      // Force play audio instantly on user touch/click
+      playAudio();
 
       giftCard.style.opacity = '0';
       setTimeout(() => giftCard.classList.add('hidden'), 800);
@@ -475,9 +481,8 @@
       }, 6000);
     }
 
-    // Attach both touch and click events
-    giftCard.addEventListener('click', handleGiftClick);
-    giftCard.addEventListener('touchstart', handleGiftClick, { passive: false });
+    // Touch and Click events optimized for Mobile Safari / Chrome
+    giftCard.addEventListener('pointerdown', handleGiftClick);
 
     function startRoseBloom() {
       const centerX = roseCanvas.width / 2;
