@@ -31,6 +31,7 @@
       cursor: pointer;
       perspective: 1000px;
       transition: opacity 0.8s ease, transform 0.3s ease;
+      touch-action: manipulation;
     }
     .gift-container:hover {
       transform: scale(1.05);
@@ -447,21 +448,29 @@
       }
     }
 
-    function handleGiftClick(e) {
-      if (e) e.preventDefault();
-      if (isClicked) return;
-      isClicked = true;
-
-      // Unlocks and plays audio on click/touch
+    // Helper function to safely play music on mobile browsers
+    function playAudioForMobile() {
       if (bgMusic) {
+        bgMusic.volume = 1.0;
         bgMusic.currentTime = 0;
-        const playPromise = bgMusic.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.log("Audio play deferred or failed:", error);
+        
+        const promise = bgMusic.play();
+        if (promise !== undefined) {
+          promise.then(() => {
+            console.log("Audio started successfully!");
+          }).catch(error => {
+            console.log("Audio playback deferred or failed: ", error);
           });
         }
       }
+    }
+
+    function handleGiftClick(e) {
+      if (isClicked) return;
+      isClicked = true;
+
+      // Play audio directly upon touch/click gesture
+      playAudioForMobile();
 
       giftCard.style.opacity = '0';
       setTimeout(() => giftCard.classList.add('hidden'), 800);
@@ -476,8 +485,8 @@
       }, 6000);
     }
 
-    giftCard.addEventListener('click', handleGiftClick);
-    giftCard.addEventListener('touchstart', handleGiftClick, { passive: false });
+    // Pointerdown trigger works universally for touchscreens and desktop clicks
+    giftCard.addEventListener('pointerdown', handleGiftClick);
 
     function startRoseBloom() {
       const centerX = roseCanvas.width / 2;
