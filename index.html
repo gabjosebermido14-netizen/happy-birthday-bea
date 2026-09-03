@@ -111,11 +111,72 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
-    .cake-icon {
-      font-size: clamp(3.5rem, 10vw, 6rem);
-      margin-bottom: 10px;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+
+    /* REALISTIC 3D CSS CAKE */
+    .realistic-cake {
+      position: relative;
+      width: clamp(100px, 22vw, 140px);
+      height: clamp(80px, 18vw, 110px);
+      margin-bottom: 25px;
+      perspective: 500px;
     }
+    .cake-base {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60%;
+      background: linear-gradient(to right, #4a2c20, #7a4a35, #361f16);
+      border-radius: 10px 10px 15px 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 -5px 10px rgba(0,0,0,0.5);
+    }
+    .cake-icing {
+      position: absolute;
+      top: 25%;
+      width: 104%;
+      left: -2%;
+      height: 30%;
+      background: linear-gradient(to bottom, #fff0f3, #ffb3c1);
+      border-radius: 12px 12px 8px 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .cake-icing::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: radial-gradient(circle, #ffb3c1 60%, transparent 70%);
+      background-size: 15px 15px;
+    }
+    .candle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 30px;
+      background: repeating-linear-gradient(45deg, #fff, #fff 5px, #ff4d6d 5px, #ff4d6d 10px);
+      border-radius: 3px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+    .flame {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 18px;
+      background: radial-gradient(ellipse at bottom, #ffea00 0%, #ff6d00 60%, transparent 100%);
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 15px #ffea00, 0 0 25px #ff6d00;
+      animation: flicker 0.1s infinite alternate;
+    }
+    @keyframes flicker {
+      0% { transform: translateX(-50%) scale(1) rotate(-2deg); opacity: 0.95; }
+      100% { transform: translateX(-50%) scale(1.1) rotate(2deg); opacity: 1; }
+    }
+
     .greeting-text {
       font-size: clamp(1.8rem, 6vw, 3.2rem);
       color: #ff4d6d;
@@ -148,8 +209,15 @@
     .popup-message {
       font-size: clamp(1rem, 3.5vw, 1.25rem);
       color: #f1f1f1;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       line-height: 1.5;
+    }
+    .popup-submessage {
+      font-size: clamp(0.95rem, 3.2vw, 1.15rem);
+      color: #ffd700;
+      margin-bottom: 15px;
+      line-height: 1.4;
+      font-weight: 500;
     }
     .popup-author {
       font-size: clamp(0.85rem, 3vw, 1rem);
@@ -185,12 +253,19 @@
   </div>
 
   <div class="greeting-overlay" id="greetingOverlay">
-    <div class="cake-icon">🎂</div>
-    <div class="greeting-text">Happy Birthday, Bea! 🎉</div>
+    <div class="realistic-cake">
+      <div class="candle">
+        <div class="flame"></div>
+      </div>
+      <div class="cake-icing"></div>
+      <div class="cake-base"></div>
+    </div>
+    <div class="greeting-text">Happy Birthday, Bea!</div>
   </div>
 
   <div class="popup-modal" id="popupModal">
     <p class="popup-message">I wish you appreciate it!</p>
+    <p class="popup-submessage">Wishing you many more years to come!</p>
     <p class="popup-author">From your ITnorante Gab tsaaahahaha</p>
   </div>
 
@@ -377,7 +452,6 @@
       if (isClicked) return;
       isClicked = true;
 
-      // Mobile Browser Audio Unlock Policy
       if (bgMusic) {
         bgMusic.currentTime = 0;
         const playPromise = bgMusic.play();
@@ -401,7 +475,7 @@
       }, 6000);
     }
 
-    // Attach both touch and click events for maximum responsiveness across devices
+    // Attach both touch and click events
     giftCard.addEventListener('click', handleGiftClick);
     giftCard.addEventListener('touchstart', handleGiftClick, { passive: false });
 
@@ -428,7 +502,7 @@
         if (currentRadius > maxDistance) {
           clearInterval(ringInterval);
 
-          // DELAY 2: 6 Seconds Bago Mahulog ang Rosas at Lumabas ang Note
+          // DELAY 2: 6 Seconds
           setTimeout(() => {
             isFallingStarted = true;
             popupModal.classList.add('show');
