@@ -24,6 +24,26 @@
       color: #fff;
     }
 
+    /* Music Toggle Button */
+    .music-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+    }
+    .music-btn:active {
+      transform: scale(0.95);
+    }
+
     /* Realistic 3D Gift Box */
     .gift-container {
       position: relative;
@@ -244,7 +264,8 @@
 </head>
 <body>
 
-  <audio id="bgMusic" src="style.mp3" preload="auto" playsinline></audio>
+  <button class="music-btn" id="musicToggle">🎵 Music On</button>
+  <audio id="bgMusic" src="style.mp3" preload="auto" loop playsinline></audio>
 
   <div class="gift-container" id="giftCard">
     <div class="realistic-box">
@@ -282,6 +303,7 @@
     const greetingOverlay = document.getElementById('greetingOverlay');
     const popupModal = document.getElementById('popupModal');
     const bgMusic = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicToggle');
 
     function resizeCanvases() {
       confettiCanvas.width = window.innerWidth;
@@ -301,6 +323,33 @@
     // Load Local Rose Image
     const roseImg = new Image();
     roseImg.src = 'rose.png';
+
+    // Force Play Audio Handler (Mobile Compliant)
+    function enableAudio() {
+      if (!bgMusic) return;
+      bgMusic.volume = 1.0;
+      const playPromise = bgMusic.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          musicBtn.innerText = '🎵 Music Off';
+        }).catch(error => {
+          console.log("Autoplay hindered by browser settings:", error);
+          musicBtn.innerText = '🔇 Tap for Music';
+        });
+      }
+    }
+
+    // Toggle Music Button Click
+    musicBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicBtn.innerText = '🎵 Music Off';
+      } else {
+        bgMusic.pause();
+        musicBtn.innerText = '🔇 Music On';
+      }
+    });
 
     // Confetti Effect
     class Confetti {
@@ -447,26 +496,12 @@
       }
     }
 
-    // Function to handle audio playback smoothly on Mobile browsers
-    function playAudio() {
-      if (bgMusic) {
-        bgMusic.load(); // Force reload audio buffer
-        bgMusic.currentTime = 0;
-        const playPromise = bgMusic.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.log("Audio play blocked, waiting for user interaction:", error);
-          });
-        }
-      }
-    }
-
     function handleGiftClick(e) {
       if (isClicked) return;
       isClicked = true;
 
-      // Force play audio instantly on user touch/click
-      playAudio();
+      // Unlocks and starts audio
+      enableAudio();
 
       giftCard.style.opacity = '0';
       setTimeout(() => giftCard.classList.add('hidden'), 800);
@@ -481,8 +516,8 @@
       }, 6000);
     }
 
-    // Touch and Click events optimized for Mobile Safari / Chrome
-    giftCard.addEventListener('pointerdown', handleGiftClick);
+    giftCard.addEventListener('click', handleGiftClick);
+    giftCard.addEventListener('touchstart', handleGiftClick, { passive: true });
 
     function startRoseBloom() {
       const centerX = roseCanvas.width / 2;
