@@ -92,7 +92,7 @@
       transform: rotate(-45deg) scaleX(-1);
     }
 
-    /* Greeting Overlay (Responsive Text) */
+    /* Greeting Overlay */
     .greeting-overlay {
       position: fixed;
       top: 50%;
@@ -123,7 +123,7 @@
       text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     }
 
-    /* Final Popup Card (Responsive Width) */
+    /* Final Popup Card */
     .popup-modal {
       position: fixed;
       top: 50%;
@@ -176,9 +176,9 @@
 </head>
 <body>
 
-  <audio id="bgMusic" src="style.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="style.mp3" preload="auto" playsinline></audio>
 
-  <div class="gift-container" id="giftCard" onclick="handleGiftClick()">
+  <div class="gift-container" id="giftCard">
     <div class="realistic-box">
       <div class="bow"></div>
     </div>
@@ -186,12 +186,12 @@
 
   <div class="greeting-overlay" id="greetingOverlay">
     <div class="cake-icon">🎂</div>
-    <div class="greeting-text">Happy Birthday, Bea! </div>
+    <div class="greeting-text">Happy Birthday, Bea! 🎉</div>
   </div>
 
   <div class="popup-modal" id="popupModal">
-    <p class="popup-message">I wish you appreciate it! </p>
-    <p class="popup-author">From your ITnorante Gab tsaaahahaha </p>
+    <p class="popup-message">I wish you appreciate it!</p>
+    <p class="popup-author">From your ITnorante Gab tsaaahahaha</p>
   </div>
 
   <canvas id="confettiCanvas"></canvas>
@@ -221,6 +221,7 @@
     let roses = [];
     let softRoses = [];
     let isFallingStarted = false;
+    let isClicked = false;
 
     // Load Local Rose Image
     const roseImg = new Image();
@@ -276,7 +277,6 @@
         this.angle = angle;
         this.currentScale = 0;
         
-        // Dynamic scale base sa lapad ng screen para sakto sa CP man o PC
         const baseScale = window.innerWidth < 600 ? 0.14 : 0.18;
         this.maxScale = Math.random() * 0.03 + baseScale; 
         this.growthRate = 0.01;
@@ -372,9 +372,20 @@
       }
     }
 
-    function handleGiftClick() {
+    function handleGiftClick(e) {
+      if (e) e.preventDefault();
+      if (isClicked) return;
+      isClicked = true;
+
+      // Mobile Browser Audio Unlock Policy
       if (bgMusic) {
-        bgMusic.play().catch(err => console.log("Play failed:", err));
+        bgMusic.currentTime = 0;
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log("Audio play deferred or failed:", error);
+          });
+        }
       }
 
       giftCard.style.opacity = '0';
@@ -389,6 +400,10 @@
         startRoseBloom();
       }, 6000);
     }
+
+    // Attach both touch and click events for maximum responsiveness across devices
+    giftCard.addEventListener('click', handleGiftClick);
+    giftCard.addEventListener('touchstart', handleGiftClick, { passive: false });
 
     function startRoseBloom() {
       const centerX = roseCanvas.width / 2;
