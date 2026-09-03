@@ -24,26 +24,6 @@
       color: #fff;
     }
 
-    /* Music Toggle Button */
-    .music-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 14px;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      transition: all 0.3s ease;
-    }
-    .music-btn:active {
-      transform: scale(0.95);
-    }
-
     /* Realistic 3D Gift Box */
     .gift-container {
       position: relative;
@@ -264,8 +244,7 @@
 </head>
 <body>
 
-  <button class="music-btn" id="musicToggle">🎵 Music On</button>
-  <audio id="bgMusic" src="style.mp3" preload="auto" loop playsinline></audio>
+  <audio id="bgMusic" src="style.mp3" preload="auto" playsinline></audio>
 
   <div class="gift-container" id="giftCard">
     <div class="realistic-box">
@@ -281,13 +260,13 @@
       <div class="cake-icing"></div>
       <div class="cake-base"></div>
     </div>
-    <div class="greeting-text">Happy Birthday, Bea!</div>
+    <div class="greeting-text">Happy Birthday, Bea! </div>
   </div>
 
   <div class="popup-modal" id="popupModal">
     <p class="popup-message">I wish you appreciate it!</p>
-    <p class="popup-submessage">Wishing you many more years to come!</p>
-    <p class="popup-author">From your ITnorante Gab tsaaahahaha</p>
+    <p class="popup-submessage">Wishing you many more years to come! </p>
+    <p class="popup-author">From your ITnorante Gab tsaaahahaha </p>
   </div>
 
   <canvas id="confettiCanvas"></canvas>
@@ -303,7 +282,6 @@
     const greetingOverlay = document.getElementById('greetingOverlay');
     const popupModal = document.getElementById('popupModal');
     const bgMusic = document.getElementById('bgMusic');
-    const musicBtn = document.getElementById('musicToggle');
 
     function resizeCanvases() {
       confettiCanvas.width = window.innerWidth;
@@ -323,33 +301,6 @@
     // Load Local Rose Image
     const roseImg = new Image();
     roseImg.src = 'rose.png';
-
-    // Force Play Audio Handler (Mobile Compliant)
-    function enableAudio() {
-      if (!bgMusic) return;
-      bgMusic.volume = 1.0;
-      const playPromise = bgMusic.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          musicBtn.innerText = '🎵 Music Off';
-        }).catch(error => {
-          console.log("Autoplay hindered by browser settings:", error);
-          musicBtn.innerText = '🔇 Tap for Music';
-        });
-      }
-    }
-
-    // Toggle Music Button Click
-    musicBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (bgMusic.paused) {
-        bgMusic.play();
-        musicBtn.innerText = '🎵 Music Off';
-      } else {
-        bgMusic.pause();
-        musicBtn.innerText = '🔇 Music On';
-      }
-    });
 
     // Confetti Effect
     class Confetti {
@@ -497,11 +448,20 @@
     }
 
     function handleGiftClick(e) {
+      if (e) e.preventDefault();
       if (isClicked) return;
       isClicked = true;
 
-      // Unlocks and starts audio
-      enableAudio();
+      // Unlocks and plays audio on click/touch
+      if (bgMusic) {
+        bgMusic.currentTime = 0;
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log("Audio play deferred or failed:", error);
+          });
+        }
+      }
 
       giftCard.style.opacity = '0';
       setTimeout(() => giftCard.classList.add('hidden'), 800);
@@ -517,7 +477,7 @@
     }
 
     giftCard.addEventListener('click', handleGiftClick);
-    giftCard.addEventListener('touchstart', handleGiftClick, { passive: true });
+    giftCard.addEventListener('touchstart', handleGiftClick, { passive: false });
 
     function startRoseBloom() {
       const centerX = roseCanvas.width / 2;
