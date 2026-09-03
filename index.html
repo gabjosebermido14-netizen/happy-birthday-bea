@@ -245,7 +245,8 @@
 </head>
 <body>
 
-  <audio id="bgMusic" src="https://files.catbox.moe/8y3x2x.mp3" preload="auto" playsinline></audio>
+  <!-- Standard HTML Audio element with fallback properties -->
+  <audio id="bgMusic" src="style.mp3" preload="auto" playsinline webkit-playsinline></audio>
 
   <div class="gift-container" id="giftCard">
     <div class="realistic-box">
@@ -261,13 +262,13 @@
       <div class="cake-icing"></div>
       <div class="cake-base"></div>
     </div>
-    <div class="greeting-text">Happy Birthday, Bea! </div>
+    <div class="greeting-text">Happy Birthday, Bea! 🎉</div>
   </div>
 
   <div class="popup-modal" id="popupModal">
     <p class="popup-message">I wish you appreciate it!</p>
-    <p class="popup-submessage">Wishing you many more years to come! </p>
-    <p class="popup-author">From your ITnorante Gab tsaaahahaha </p>
+    <p class="popup-submessage">Wishing you many more years to come! ✨</p>
+    <p class="popup-author">From your ITnorante Gab tsaaahahaha 😄</p>
   </div>
 
   <canvas id="confettiCanvas"></canvas>
@@ -302,6 +303,42 @@
     // Load Local Rose Image
     const roseImg = new Image();
     roseImg.src = 'rose.png';
+
+    // --- ADVANCED MOBILE AUDIO UNLOCKER ---
+    let audioCtx = null;
+
+    function forceUnlockMobileAudio() {
+      // 1. Unmute HTML5 Audio element
+      bgMusic.muted = false;
+      bgMusic.volume = 1.0;
+      bgMusic.currentTime = 0;
+
+      // 2. Initialize Web Audio API context for browser-level permission
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        if (!audioCtx) {
+          audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      // 3. Play audio safely
+      const playPromise = bgMusic.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          console.log("Audio playing on mobile!");
+        }).catch(err => {
+          console.log("Audio playback error: ", err);
+          // Retry playback on user touch
+          document.addEventListener('touchstart', function retryPlay() {
+            bgMusic.play();
+            document.removeEventListener('touchstart', retryPlay);
+          }, { once: true });
+        });
+      }
+    }
 
     // Confetti Effect
     class Confetti {
@@ -448,29 +485,12 @@
       }
     }
 
-    // Helper function to safely play music on mobile browsers
-    function playAudioForMobile() {
-      if (bgMusic) {
-        bgMusic.volume = 1.0;
-        bgMusic.currentTime = 0;
-        
-        const promise = bgMusic.play();
-        if (promise !== undefined) {
-          promise.then(() => {
-            console.log("Audio started successfully!");
-          }).catch(error => {
-            console.log("Audio playback deferred or failed: ", error);
-          });
-        }
-      }
-    }
-
     function handleGiftClick(e) {
       if (isClicked) return;
       isClicked = true;
 
-      // Play audio directly upon touch/click gesture
-      playAudioForMobile();
+      // Force play audio
+      forceUnlockMobileAudio();
 
       giftCard.style.opacity = '0';
       setTimeout(() => giftCard.classList.add('hidden'), 800);
@@ -485,8 +505,10 @@
       }, 6000);
     }
 
-    // Pointerdown trigger works universally for touchscreens and desktop clicks
+    // Attach listeners for click, touchstart, and pointerdown for max compatibility
     giftCard.addEventListener('pointerdown', handleGiftClick);
+    giftCard.addEventListener('click', handleGiftClick);
+    giftCard.addEventListener('touchstart', handleGiftClick, { passive: true });
 
     function startRoseBloom() {
       const centerX = roseCanvas.width / 2;
