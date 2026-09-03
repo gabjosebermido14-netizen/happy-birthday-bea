@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Happy Birthday Bea!</title>
   <style>
     * {
@@ -10,16 +10,17 @@
       margin: 0;
       padding: 0;
     }
-    body {
-      font-family: 'Georgia', serif;
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       background-color: #0d0d0d;
-      min-height: 100vh;
+      font-family: 'Georgia', serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      overflow: hidden;
       color: #fff;
     }
 
@@ -35,8 +36,8 @@
       transform: scale(1.05);
     }
     .realistic-box {
-      width: 150px;
-      height: 150px;
+      width: clamp(120px, 30vw, 160px);
+      height: clamp(120px, 30vw, 160px);
       position: relative;
       background: linear-gradient(135deg, #d32f2f, #8b0000);
       border-radius: 12px;
@@ -48,7 +49,7 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 30px;
+      width: 20%;
       height: 100%;
       background: linear-gradient(to right, #ffe066, #ffd700, #b8860b);
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
@@ -60,24 +61,24 @@
       left: 0;
       transform: translateY(-50%);
       width: 100%;
-      height: 30px;
+      height: 20%;
       background: linear-gradient(to bottom, #ffe066, #ffd700, #b8860b);
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
     .bow {
       position: absolute;
-      top: -25px;
+      top: -20%;
       left: 50%;
       transform: translateX(-50%);
-      width: 60px;
-      height: 30px;
+      width: 40%;
+      height: 20%;
       z-index: 2;
     }
     .bow::before, .bow::after {
       content: '';
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 50%;
+      height: 100%;
       border-radius: 50% 50% 0 50%;
       background: linear-gradient(135deg, #ffd700, #b8860b);
       box-shadow: 0 5px 10px rgba(0,0,0,0.4);
@@ -91,7 +92,7 @@
       transform: rotate(-45deg) scaleX(-1);
     }
 
-    /* Greeting Overlay */
+    /* Greeting Overlay (Responsive Text) */
     .greeting-overlay {
       position: fixed;
       top: 50%;
@@ -104,39 +105,39 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 90%;
     }
     .greeting-overlay.show {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
     .cake-icon {
-      font-size: 5rem;
+      font-size: clamp(3.5rem, 10vw, 6rem);
       margin-bottom: 10px;
       filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
     }
     .greeting-text {
-      font-size: 2.5rem;
+      font-size: clamp(1.8rem, 6vw, 3.2rem);
       color: #ff4d6d;
       font-weight: bold;
       text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     }
 
-    /* Final Popup Card */
+    /* Final Popup Card (Responsive Width) */
     .popup-modal {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.7);
-      background: rgba(20, 20, 20, 0.92);
-      padding: 30px 25px;
+      background: rgba(20, 20, 20, 0.94);
+      padding: clamp(20px, 5vw, 35px);
       border-radius: 20px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.8);
       z-index: 50;
       opacity: 0;
       pointer-events: none;
       transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      max-width: 320px;
-      width: 90%;
+      width: min(90%, 400px);
       border: 1px solid #ff4d6d;
     }
     .popup-modal.show {
@@ -145,13 +146,13 @@
       transform: translate(-50%, -50%) scale(1);
     }
     .popup-message {
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 3.5vw, 1.25rem);
       color: #f1f1f1;
       margin-bottom: 15px;
       line-height: 1.5;
     }
     .popup-author {
-      font-size: 0.95rem;
+      font-size: clamp(0.85rem, 3vw, 1rem);
       color: #ff4d6d;
       font-weight: bold;
       font-style: italic;
@@ -185,12 +186,12 @@
 
   <div class="greeting-overlay" id="greetingOverlay">
     <div class="cake-icon">🎂</div>
-    <div class="greeting-text">Happy Birthday, Bea! 🎉</div>
+    <div class="greeting-text">Happy Birthday, Bea! </div>
   </div>
 
   <div class="popup-modal" id="popupModal">
-    <p class="popup-message">I wish you appreciate it! ✨</p>
-    <p class="popup-author">Created by your ITnorante Gab tsaaahahaha 😄</p>
+    <p class="popup-message">I wish you appreciate it! </p>
+    <p class="popup-author">From your ITnorante Gab tsaaahahaha </p>
   </div>
 
   <canvas id="confettiCanvas"></canvas>
@@ -218,7 +219,7 @@
 
     let confettiParticles = [];
     let roses = [];
-    let softRoses = []; // Para sa huling bahagi
+    let softRoses = [];
     let isFallingStarted = false;
 
     // Load Local Rose Image
@@ -274,7 +275,10 @@
         this.targetRadius = radius;
         this.angle = angle;
         this.currentScale = 0;
-        this.maxScale = Math.random() * 0.04 + 0.18; 
+        
+        // Dynamic scale base sa lapad ng screen para sakto sa CP man o PC
+        const baseScale = window.innerWidth < 600 ? 0.14 : 0.18;
+        this.maxScale = Math.random() * 0.03 + baseScale; 
         this.growthRate = 0.01;
         this.opacity = 1;
 
@@ -323,15 +327,16 @@
       }
     }
 
-    // Last Part: Soft Spread Soft Appearing and Disappearing Roses
+    // Last Part: Soft Spread Roses
     class SoftSpreadRose {
       constructor() {
         this.x = Math.random() * (roseCanvas.width - 60) + 30;
         this.y = Math.random() * (roseCanvas.height - 60) + 30;
-        this.scale = Math.random() * 0.04 + 0.18;
+        const baseScale = window.innerWidth < 600 ? 0.14 : 0.18;
+        this.scale = Math.random() * 0.03 + baseScale;
         this.rotation = Math.random() * Math.PI * 2;
         this.opacity = 0;
-        this.state = 'fade-in'; // 'fade-in', 'hold', 'fade-out'
+        this.state = 'fade-in';
       }
 
       update() {
@@ -390,7 +395,7 @@
       const centerY = roseCanvas.height / 2;
       const maxDistance = Math.hypot(centerX, centerY) + 80;
 
-      let currentRadius = 50;
+      let currentRadius = 40;
       let angleOffset = 0;
 
       const ringInterval = setInterval(() => {
@@ -402,41 +407,37 @@
           roses.push(new RealisticRose(centerX, centerY, currentRadius, angle));
         }
 
-        currentRadius += 100;
+        currentRadius += window.innerWidth < 600 ? 70 : 100;
         angleOffset += 0.4;
 
         if (currentRadius > maxDistance) {
           clearInterval(ringInterval);
 
-          // DELAY 2: 6 Seconds Bago Mahulog ang Rosas at Lumabas ang Message
+          // DELAY 2: 6 Seconds Bago Mahulog ang Rosas at Lumabas ang Note
           setTimeout(() => {
             isFallingStarted = true;
             popupModal.classList.add('show');
 
-            // Simulan ang Soft Spread Rose Effect sa Huling Bahagi
             setTimeout(startSoftSpreadBackground, 1500);
           }, 6000);
         }
       }, 250);
     }
 
-    // Function para sa Huling Bahagi (Soft Spread + Soft Fade In/Out Every 4 Seconds)
     function startSoftSpreadBackground() {
       function spawnSpreadRoses() {
         softRoses = [];
-        // Gagawa ng 20 nakakalat na rosas sa canvas
-        for (let i = 0; i < 20; i++) {
+        const roseCount = window.innerWidth < 600 ? 14 : 22;
+        for (let i = 0; i < roseCount; i++) {
           softRoses.push(new SoftSpreadRose());
         }
 
-        // Pagkalipas ng 2 seconds, magsi-simula silang mag-fade out
         setTimeout(() => {
           softRoses.forEach(rose => rose.state = 'fade-out');
         }, 2000);
       }
 
       spawnSpreadRoses();
-      // Paulit-ulit tuwing 4 seconds
       setInterval(spawnSpreadRoses, 4000);
     }
 
@@ -450,7 +451,6 @@
         if (p.opacity <= 0) confettiParticles.splice(index, 1);
       });
 
-      // Render 1st Part Roses
       roses.forEach((rose, index) => {
         rose.update();
         rose.draw();
@@ -459,7 +459,6 @@
         }
       });
 
-      // Render Last Part Soft Spread Roses
       softRoses.forEach(rose => {
         rose.update();
         rose.draw();
